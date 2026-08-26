@@ -17,8 +17,8 @@ def upload_data():
         for i in os.listdir('/data'):
             print(i)
             hook.upload_file_to_directory(
-                file_system_name = 'nyctaxidata',
-                directory_name = 'raw_data',
+                file_system_name = 'extlocation',
+                directory_name = f'raw_data/{i[0:i.find('_')]}_trip/',
                 file_name = i,
                 file_path = f'/data/{i}',
                 overwrite = True
