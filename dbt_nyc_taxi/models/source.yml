@@ -1,0 +1,9 @@
+sources:
+  - name: source
+    database: nyc_taxi_project
+    schema: bronze
+    tables:
+      - name: yellow_taxi
+      - name: green_taxi
+      - name: fhv_trip
+      - name: fhvhv_trip
