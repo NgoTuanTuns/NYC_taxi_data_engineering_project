@@ -1,7 +1,15 @@
+{{
+  config(
+    materialized = 'incremental',
+    incremental_strategy='merge'
+    )
+}}
 WITH source as(
     SELECT *
-    FROM {{ ref('green_taxi') }} 
-    WHERE ingestion_at = (SELECT max(ingestion_at) FROM {{ ref('green_taxi') }})
+    FROM {{ ref('green_taxi') }}
+    {% if is_incremental() %}
+    WHERE ingestion_at > (SELECT MAX(ingestion_at) FROM {{ this }})
+    {% endif %}
 ),
 
 deduplication as(

@@ -6,4 +6,4 @@
   )
 }}
 
-select * from {{ ref('Yellow_taxi_transforming') }}
+SELECT * FROM {{ ref('Yellow_taxi_transforming') }}
