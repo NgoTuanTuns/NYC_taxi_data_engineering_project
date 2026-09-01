@@ -88,7 +88,16 @@ cast_and_enrich_data AS (
 )
 
 SELECT
-*
+    {{ dbt_utils.generate_surrogate_key([
+        'dispatching_base_num', 
+        'pickup_datetime',
+        'dropoff_datetime',
+        'PULocationID',
+        'DOLocationID',
+        'Affiliated_base_number',
+        'SR_Flag'
+    ]) }} AS fhv_trip_id,
+    *
 FROM cast_and_enrich_data
 
 

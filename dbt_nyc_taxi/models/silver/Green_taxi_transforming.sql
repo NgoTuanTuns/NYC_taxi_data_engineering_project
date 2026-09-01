@@ -84,7 +84,7 @@ SELECT
     store_and_fwd_flag,
     PULocationID,
     DOLocationID,
-    payment_type,
+    payment_type as payment_type_id,
     trip_type,
     fare_amount,
     extra,
@@ -112,6 +112,6 @@ SELECT
         'trip_distance',
         'fare_amount',
         'total_amount'
-    ]) }} AS taxi_trip_id,
+    ]) }} AS green_taxi_trip_id,
     *
 FROM cast_data_types_and_enrich
