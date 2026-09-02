@@ -27,14 +27,14 @@ def upload_data():
         print('We got errors!: \n', e)
 
 with DAG(
-    dag_id = 'Ingestion',
+    dag_id = 'nyc_taxi_ingest_to_adls',
     default_args = default_args,
     schedule = '@monthly',
     catchup = False
 ) as dag:
-    task2 = PythonOperator(task_id = 'upload_file', python_callable = upload_data)
+    task1 = PythonOperator(task_id = 'upload_file', python_callable = upload_data)
     
-    task2
+    task1
 
 
 
