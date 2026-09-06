@@ -72,9 +72,9 @@ cast_and_enrich_data AS (
       dispatching_base_num,
       cast(pickup_datetime AS TIMESTAMP_NTZ),
       cast(dropoff_datetime AS TIMESTAMP_NTZ),
-      LPAD(cast(timestampdiff(HOUR, pickup_datetime, dropOff_datetime) AS BIGINT), 2, '0') || ":" ||
-      LPAD(cast(timestampdiff(MINUTE, pickup_datetime, dropOff_datetime) - timestampdiff(HOUR, pickup_datetime, dropOff_datetime)*60 AS BIGINT), 2, '0')   || ":" ||
-      LPAD(cast(timestampdiff(SECOND, pickup_datetime, dropOff_datetime) - timestampdiff(MINUTE, pickup_datetime, dropOff_datetime)*60 AS BIGINT), 2, '0') AS trip_duration,
+      LPAD(CAST(timestampdiff(second, pickup_datetime, dropoff_datetime) / 3600 AS BIGINT), 2, '0') || ':' ||
+      LPAD(CAST((timestampdiff(second, pickup_datetime, dropoff_datetime) % 3600) / 60 AS BIGINT), 2, '0') || ':' ||
+      LPAD(CAST(timestampdiff(second, pickup_datetime, dropoff_datetime) % 60 AS BIGINT), 2, '0') trip_duration,
       PUlocationID,
       DOlocationID,
       SR_Flag, 

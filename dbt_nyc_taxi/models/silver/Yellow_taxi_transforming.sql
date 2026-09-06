@@ -72,11 +72,11 @@ valid_data as (
 cast_data_types_and_enrich as(
 select
     VendorID,
-    cast(tpep_pickup_datetime as TIMESTAMP_NTZ),
-    cast(tpep_dropoff_datetime as TIMESTAMP_NTZ),
-    cast(cast(timestampdiff(HOUR, lpep_pickup_datetime, lpep_dropoff_datetime) AS STRING) || ":" ||
-    cast(timestampdiff(MINUTE, lpep_pickup_datetime, lpep_dropoff_datetime) - timestampdiff(HOUR, lpep_pickup_datetime, lpep_dropoff_datetime)*60 AS STRING) || ":" ||
-    cast(timestampdiff(SECOND, lpep_pickup_datetime, lpep_dropoff_datetime) - timestampdiff(MINUTE, lpep_pickup_datetime, lpep_dropoff_datetime)*60 AS STRING) AS TIME) AS trip_duration,
+    cast(tpep_pickup_datetime as TIMESTAMP_NTZ) as tpep_pickup_datetime,
+    cast(tpep_dropoff_datetime as TIMESTAMP_NTZ) as tpep_dropoff_datetime,
+    LPAD(CAST(timestampdiff(second, tpep_pickup_datetime, tpep_dropoff_datetime) / 3600 AS BIGINT), 2, '0') || ':' ||
+    LPAD(CAST((timestampdiff(second, tpep_pickup_datetime, tpep_dropoff_datetime) % 3600) / 60 AS BIGINT), 2, '0') || ':' ||
+    LPAD(CAST(timestampdiff(second, tpep_pickup_datetime, tpep_dropoff_datetime) % 60 AS BIGINT), 2, '0') trip_duration,
     passenger_count,
     trip_distance,
     RatecodeID,
