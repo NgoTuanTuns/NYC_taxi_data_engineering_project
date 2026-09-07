@@ -1,0 +1,166 @@
+models:
+  - name: yellow_taxi_transforming
+    columns:
+      - name: yellow_taxi_trip_id
+        tests:
+          - unique
+          - not_null
+
+      - name: VendorID
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 6, 7]
+
+      - name: tpep_pickup_datetime
+        tests:
+          - not_null
+
+      - name: tpep_dropoff_datetime
+        tests:
+          - not_null
+
+      - name: trip_duration
+        tests:
+          - not null
+
+      - name: trip_distance
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: fare_amount
+        tests:
+          - not_null
+
+      - name: payment_type
+        tests:
+          - accepted_values:
+              values: [1, 2, 3, 4, 5, 6]
+              severity: warn
+
+      - name: RatecodeID
+        tests:
+          - accepted_values:
+              values: [1, 2, 3, 4, 5, 6, 99]
+              severity: warn
+
+      - name: PULocationID
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+
+      - name: DOLocationID
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+
+      - name: data_completeness_flag
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                [
+                  "Complete",
+                  "Vendor_feed_incomplete",
+                  "Partial_null",
+                  "Not_recorded",
+                ]
+
+      - name: row_quality_flag
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                [
+                  "valid",
+                  "valid_refund",
+                  "suspicious_negative_fare",
+                  "suspicious_negative_total",
+                  "zero_duration",
+                ]
+  - name: green_taxi_transforming
+    columns:
+      - name: green_taxi_trip_id
+        tests:
+          - unique
+          - not_null
+
+      - name: VendorID
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 6, 7]
+
+      - name: lpep_pickup_datetime
+        tests:
+          - not_null
+
+      - name: lpep_dropoff_datetime
+        tests:
+          - not_null
+
+      - name: trip_duration
+        tests:
+          - not null
+      - name: trip_distance
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: fare_amount
+        tests:
+          - not_null
+
+      - name: payment_type_id
+        tests:
+          - accepted_values:
+              values: [1, 2, 3, 4, 5, 6]
+              severity: warn
+
+      - name: RatecodeID
+        tests:
+          - accepted_values:
+              values: [1, 2, 3, 4, 5, 6, 99]
+              severity: warn
+
+      - name: PULocationID
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+
+      - name: DOLocationID
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+
+      - name: data_completeness_flag
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                [
+                  "Complete",
+                  "Vendor_feed_incomplete",
+                  "Partial_null",
+                  "Not_recorded",
+                ]
+
+      - name: row_quality_flag
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                [
+                  "valid",
+                  "valid_refund",
+                  "suspicious_negative_fare",
+                  "suspicious_negative_total",
+                  "zero_duration",
+                ]
