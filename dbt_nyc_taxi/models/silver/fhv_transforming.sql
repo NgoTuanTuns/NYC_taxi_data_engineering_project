@@ -7,9 +7,27 @@
 WITH source AS(
 SELECT * FROM {{ ref('fhv_trip') }}
 {% if is_incremental() %}
-  WHERE ingestion_at > (SELECT max(ingestion_at) FROM {{this}})
+  WHERE ingestion_at > COALESCE((SELECT max(ingestion_at) FROM {{this}}),'1900-01-01')
 {% endif %}
 ),
+
+deduplication AS(
+  SELECT * FROM(
+    SELECT *,
+    row_number() OVER(PARTITION BY
+      dispatching_base_num,
+      pickup_datetime,
+      dropOff_datetime,
+      PUlocationID,
+      DOlocationID,
+      SR_Flag, 
+      Affiliated_base_number
+    ORDER BY pickup_datetime) AS row_num
+   FROM source
+  )t
+  WHERE row_num = 1
+),
+
 
 null_pu_do_handling AS(
     SELECT *,
@@ -19,7 +37,7 @@ null_pu_do_handling AS(
       WHEN DOLocationID IS NULL THEN 'unknown_dropoff_zone'
     ELSE 'Complete_pu_do_zone'
     END AS location_flag
-   FROM source
+   FROM deduplication
 ),
 
 affiliated_and_dispatch_handling AS (
@@ -49,24 +67,6 @@ handling_invalid_value AS (
 ),
 
 
-deduplication AS(
-  SELECT * FROM(
-    SELECT *,
-    row_number() over(partition by
-      dispatching_base_num,
-      pickup_datetime,
-      dropOff_datetime,
-      PUlocationID,
-      DOlocationID,
-      SR_Flag, 
-      Affiliated_base_number
-    ORDER BY pickup_datetime) AS row_num
-   FROM handling_invalid_value
-  )t
-  WHERE row_num = 1
-),
-
-
 cast_and_enrich_data AS (
   SELECT
       dispatching_base_num,
@@ -82,7 +82,7 @@ cast_and_enrich_data AS (
       ingestion_at,
       location_flag,
       dispatch_type_flag
-  FROM deduplication
+  FROM handling_invalid_value
   WHERE row_quality LIKE 'valid_row'
   AND dispatch_type_flag NOT LIKE 'invalid_no_dispatcher'
 )

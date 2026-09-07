@@ -1,18 +1,44 @@
 {{
   config(
     materialized = 'incremental',
-    incremental_strategy = 'megre'
+    incremental_strategy = 'merge'
     )
 }}
-with source as(
+WITH source AS(
     SELECT *
     FROM {{ ref('fhvhv_trip') }}
     {% if is_incremental() %}
-    WHERE ingestion_at > coalesce((select max(ingestion_at) from {{ this }}), '1900-01-01')
+    WHERE ingestion_at > COALESCE((SELECT max(ingestion_at) FROM {{ this }}), '1900-01-01')
     {% endif %}
 ),
 
-null_handling as (
+deduplication AS (
+    SELECT *
+    FROM (
+        SELECT *, 
+        row_number() 
+            OVER(PARTITION BY
+                    hvfhs_license_num,
+                    dispatching_base_num,
+                    originating_base_num,
+                    request_datetime,
+                    on_scene_datetime,
+                    pickup_datetime,
+                    dropoff_datetime,
+                    PULocationID,
+                    DOLocationID,
+                    trip_miles,
+                    trip_time
+                ORDER BY pickup_datetime
+            ) AS row_number
+        FROM source
+    ) t
+    WHERE row_number == 1
+),
+
+
+
+null_handling AS (
     SELECT 
     hvfhs_license_num,
     dispatching_base_num,
@@ -49,10 +75,10 @@ null_handling as (
             THEN 'cross_base_dispatch'
         ELSE 'unknown'
     END AS dispatch_routing_flag
-    FROM source
+    FROM deduplication
 ),
 
-invalid_handling as (
+invalid_handling AS (
     SELECT
         *,
         CASE
@@ -77,33 +103,9 @@ invalid_handling as (
     FROM null_handling
 ),
 
-deduplication as (
-    SELECT *
-    From (
-        select *, 
-        row_number() 
-            over(partition by 
-                    hvfhs_license_num,
-                    dispatching_base_num,
-                    originating_base_num,
-                    request_datetime,
-                    on_scene_datetime,
-                    pickup_datetime,
-                    dropoff_datetime,
-                    PULocationID,
-                    DOLocationID,
-                    trip_miles,
-                    trip_time
-                order by pickup_datetime
-            ) as row_number
-        from invalid_handling
-        where row_quality_flag like 'valid'
-    ) t
-    where row_number == 1
-),
 
-cast_and_enrich_data as (
-    select 
+cast_and_enrich_data AS (
+    SELECT 
         hvfhs_license_num,
         dispatching_base_num,
         originating_base_num,
@@ -135,7 +137,8 @@ cast_and_enrich_data as (
         dispatch_routing_flag,
         row_quality_flag,
         ingestion_at
-    FROM deduplication
+    FROM invalid_handling
+    WHERE row_quality_flag LIKE 'valid'
 )
 
 SELECT {{dbt_utils.generate_surrogate_key([
@@ -150,7 +153,7 @@ SELECT {{dbt_utils.generate_surrogate_key([
     "DOLocationID",
     "trip_miles",
     "trip_duration"
-])}} as fhvhv_trip_id,
+])}} AS fhvhv_trip_id,
 *
 FROM cast_and_enrich_data
 

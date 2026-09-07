@@ -12,7 +12,7 @@ WITH source as(
     {% endif %}
 ),
 
-deduplicate AS(
+deduplication AS(
     SELECT *
     FROM(
         SELECT*,
@@ -40,13 +40,12 @@ SELECT
     WHEN passenger_count IS NULL THEN 'Partial_null'
     ELSE 'Complete'
     END as data_completeness_flag
-FROM deduplicate
+FROM deduplication
 {# MNAR #}
 )
 
 
-
-, handling_invalid_value as(
+, handling_invalid_value AS(
     SELECT
         *,
         CASE
