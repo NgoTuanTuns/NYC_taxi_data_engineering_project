@@ -50,10 +50,11 @@ FROM deduplication
         *,
         CASE
             WHEN timestampdiff(second, tpep_pickup_datetime, tpep_dropoff_datetime) <= 0 THEN 'invalid_pickup_and_drop_time'
-            WHEN trip_distance < 0 THEN 'invalid_distance'
-            WHEN passenger_count < 0 THEN 'invalid_passenger'
+            WHEN trip_distance < 0 OR trip_distance > 100 THEN 'invalid_distance'
+            WHEN passenger_count < 0 OR passenger_count > 6 THEN 'invalid_passenger'
             WHEN mta_tax < 0 THEN 'invalid_tax'
             WHEN improvement_surcharge < 0 THEN 'invalid_surcharge'
+            WHEN fare_amount > 500 THEN 'invalid_fare_amount'
             WHEN fare_amount < 0 AND payment_type NOT IN (4, 6) THEN 'suspicious_negative_fare'
             WHEN total_amount < 0 AND payment_type NOT IN (4, 6) THEN 'suspicious_negative_total'
             WHEN fare_amount < 0 AND payment_type IN (4, 6) THEN 'valid_refund'
@@ -64,7 +65,7 @@ FROM deduplication
 valid_data as (
     SELECT *
     FROM handling_invalid_value
-    WHERE row_quality_flag NOT IN ('invalid_distance', 'invalid_passenger', 'invalid_tax', 'invalid_surcharge', 'invalid_pickup_and_drop_time')
+    WHERE row_quality_flag NOT IN ('invalid_distance', 'invalid_passenger', 'invalid_tax', 'invalid_surcharge', 'invalid_pickup_and_drop_time', 'invalid_fare_amount')
 ),
 
 

@@ -164,3 +164,77 @@ models:
                   "suspicious_negative_total",
                   "zero_duration",
                 ]
+
+  - name: fhv_transforming
+    columns:
+      - name: fhv_trip_id
+        tests:
+          - unique
+          - not_null
+
+      - name: dispatching_base_num
+        tests:
+          - not_null
+
+      - name: pickup_datetime
+        tests:
+          - not_null
+
+      - name: dropoff_datetime
+        tests:
+          - not_null
+
+      - name: dispatch_type_flag
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                [
+                  "self_dispatched",
+                  "cross_base_dispatch",
+                  "non_affiliated_or_independent",
+                ]
+
+  - name: fhvhv_transforming
+    columns:
+      - name: fhvhv_trip_id
+        tests:
+          - unique
+          - not_null
+
+      - name: hvfhs_license_num
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["HV0002", "HV0003", "HV0004", "HV0005"]
+              severity: warn
+
+      - name: base_passenger_fare
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: driver_pay
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: trip_miles
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+
+      - name: dispatch_routing_flag
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                [
+                  "direct_dispatch",
+                  "same_base_dispatch",
+                  "cross_base_dispatch",
+                  "unknown",
+                ]
