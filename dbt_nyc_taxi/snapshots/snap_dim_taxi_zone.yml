@@ -1,0 +1,12 @@
+snapshots:
+  - name: snap_dim_taxi_zone
+    relation: ref('taxi_zone_lookup')
+    config:
+      target_schema: snapshots
+      unique_key: LocationID
+      strategy: check
+      check_cols:
+        - zone
+        - borough
+        - service_zone
+      invalidate_hard_deletes: true

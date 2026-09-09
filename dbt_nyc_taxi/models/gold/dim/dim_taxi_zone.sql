@@ -1,1 +1,3 @@
-SELECT * FROM {{ ref('taxi_zone_lookup') }}
+SELECT 
+*
+FROM {{ ref('snap_dim_taxi_zone') }}

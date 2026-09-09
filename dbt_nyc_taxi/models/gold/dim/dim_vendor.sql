@@ -1,3 +1,3 @@
 SELECT
 *
-FROM {{ ref('vendor') }}
+FROM {{ ref('snap_dim_vendor') }}

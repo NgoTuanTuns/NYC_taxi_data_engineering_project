@@ -1,0 +1,12 @@
+snapshots:
+  - name: snap_dim_vendor
+    relation: ref('vendor')
+    config:
+      target_schema: snapshots
+      unique_key: vendorid
+      strategy: check
+      check_cols:
+        - vendor_name
+        - vendor_full_name
+        - tpep_provider
+      invalidate_hard_deletes: true
