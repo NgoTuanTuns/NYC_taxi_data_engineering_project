@@ -51,10 +51,11 @@ handling_invalid_value as(
     SELECT *,
         CASE 
             WHEN TIMEDIFF(SECOND, lpep_pickup_datetime, lpep_dropoff_datetime) <= 0 THEN 'invalid_pickup_and_drop_time'
-            WHEN trip_distance < 0 THEN 'invalid_distance'
-            WHEN passenger_count < 0 THEN 'invalid_passenger_count'
+            WHEN trip_distance < 0 OR trip_distance > 100 THEN 'invalid_distance'
+            WHEN passenger_count < 0 OR passenger_count > 6 THEN 'invalid_passenger_count'
             WHEN mta_tax < 0 THEN 'invalid_tax'
             WHEN improvement_surcharge < 0 THEN 'invalid_surcharge'
+            WHEN fare_amount > 400 THEN 'invalid_fare_amount'
             WHEN fare_amount < 0 AND payment_type not IN (4,6) THEN 'suspicious_negative_fare'
             WHEN total_amount < 0 AND payment_type not IN (4,6) THEN 'suspicious_negative_total'
             WHEN fare_amount < 0 or total_amount < 0 AND payment_type IN (4,6) THEN 'valid_refund'
@@ -66,7 +67,9 @@ handling_invalid_value as(
 valid_data as (
     SELECT *
     FROM handling_invalid_value
-    WHERE row_quality_flag NOT IN ('invalid_distance', 'invalid_passenger', 'invalid_tax', 'invalid_surcharge', 'invalid_pickup_and_drop_time')
+    WHERE row_quality_flag NOT IN ('invalid_distance', 'invalid_passenger', 
+    'invalid_tax', 'invalid_surcharge', 'invalid_pickup_and_drop_time',
+    'invalid_fare_amount')
 ),
 
 

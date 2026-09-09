@@ -89,13 +89,17 @@ invalid_handling AS (
             WHEN PULocationID IS NULL THEN 'invalid_no_pickup_location'
             WHEN DOLocationID IS NULL THEN 'invalid_no_dropoff_location'
             WHEN trip_miles IS NULL
-              OR trip_miles <= 0 THEN 'invalid_trip_miles'
+              OR trip_miles <= 0 
+              OR trip_miles > 150 THEN 'invalid_trip_miles'
             WHEN trip_time IS NULL
-              OR trip_time <= 0 THEN 'invalid_trip_time'
+              OR trip_time <= 0 
+              OR trip_time > 21600 THEN 'invalid_trip_time'
             WHEN base_passenger_fare IS NULL
-              OR base_passenger_fare < 0 THEN 'invalid_fare'
+              OR base_passenger_fare < 0 
+              OR base_passenger_fare > 500 THEN 'invalid_fare'
             WHEN driver_pay IS NULL
-              OR driver_pay < 0 THEN 'invalid_driver_pay'
+              OR driver_pay < 0 
+              OR driver_pay > base_passenger_fare THEN 'invalid_driver_pay'
             WHEN timestampdiff(second, pickup_datetime, dropoff_datetime) <= 0
                 THEN 'invalid_duration'
             ELSE 'valid'

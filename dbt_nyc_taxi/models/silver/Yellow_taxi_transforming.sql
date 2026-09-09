@@ -65,7 +65,8 @@ FROM deduplication
 valid_data as (
     SELECT *
     FROM handling_invalid_value
-    WHERE row_quality_flag NOT IN ('invalid_distance', 'invalid_passenger', 'invalid_tax', 'invalid_surcharge', 'invalid_pickup_and_drop_time', 'invalid_fare_amount')
+    WHERE row_quality_flag NOT IN ('invalid_distance', 'invalid_passenger', 'invalid_tax', 'invalid_surcharge',
+     'invalid_pickup_and_drop_time', 'invalid_fare_amount')
 ),
 
 
