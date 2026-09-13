@@ -2,8 +2,10 @@ import os
 from airflow import DAG
 from datetime import datetime, timedelta
 from airflow.operators.python import PythonOperator
-from airflow.sdk import Variable
+from airflow.sdk import Variable, Asset
 from airflow.providers.microsoft.azure.hooks.data_lake import AzureDataLakeStorageV2Hook
+
+ADLS_RAW_ASSET = Asset("nyc_taxi/adls/raw")
 
 default_args = {
     'owner':'Tuns',
@@ -17,7 +19,7 @@ def upload_data():
         for i in os.listdir('/data'):
             print(i)
             hook.upload_file_to_directory(
-                file_system_name = 'extlocation',
+                file_system_name = 'external',
                 directory_name = f'raw_data/{i[0:i.find('_')]}_trip/',
                 file_name = i,
                 file_path = f'/data/{i}',
@@ -32,7 +34,9 @@ with DAG(
     schedule = '@monthly',
     catchup = False
 ) as dag:
-    task1 = PythonOperator(task_id = 'upload_file', python_callable = upload_data)
+    task1 = PythonOperator(task_id = 'upload_file', 
+                           python_callable = upload_data,
+                           outlets = [ADLS_RAW_ASSET])
     
     task1
 

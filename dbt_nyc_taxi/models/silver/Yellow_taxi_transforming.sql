@@ -4,6 +4,7 @@
     incremental_strategy='merge'
     )
 }}
+
 WITH source as(
     SELECT *
     FROM {{ ref('yellow_taxi') }}
@@ -95,6 +96,7 @@ select
     congestion_surcharge,
     Airport_fee,
     cbd_congestion_fee,
+    ingestion_at,
     data_completeness_flag,
     row_quality_flag
 from valid_data

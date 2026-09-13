@@ -20,10 +20,6 @@ models:
         tests:
           - not_null
 
-      - name: trip_duration
-        tests:
-          - not null
-
       - name: trip_distance
         tests:
           - not_null
@@ -34,7 +30,7 @@ models:
         tests:
           - not_null
 
-      - name: payment_type
+      - name: payment_type_id
         tests:
           - accepted_values:
               values: [1, 2, 3, 4, 5, 6]
@@ -65,7 +61,7 @@ models:
               values:
                 [
                   "Complete",
-                  "Vendor_feed_incomplete",
+                  "Incomplete_vendor_feed",
                   "Partial_null",
                   "Not_recorded",
                 ]
@@ -80,7 +76,6 @@ models:
                   "valid_refund",
                   "suspicious_negative_fare",
                   "suspicious_negative_total",
-                  "zero_duration",
                 ]
   - name: green_taxi_transforming
     columns:
@@ -103,9 +98,6 @@ models:
         tests:
           - not_null
 
-      - name: trip_duration
-        tests:
-          - not null
       - name: trip_distance
         tests:
           - not_null
@@ -162,7 +154,6 @@ models:
                   "valid_refund",
                   "suspicious_negative_fare",
                   "suspicious_negative_total",
-                  "zero_duration",
                 ]
 
   - name: fhv_transforming

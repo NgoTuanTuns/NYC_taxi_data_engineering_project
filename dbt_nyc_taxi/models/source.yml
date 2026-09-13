@@ -1,6 +1,6 @@
 sources:
   - name: source
-    database: nyc_taxi_project
+    database: nyc_taxi_data
     schema: bronze
     tables:
       - name: yellow_taxi
