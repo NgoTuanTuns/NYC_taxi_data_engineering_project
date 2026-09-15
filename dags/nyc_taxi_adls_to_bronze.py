@@ -22,6 +22,6 @@ with DAG(
     task1 = DatabricksRunNowOperator(
         task_id='run_bronze_ingestion',
         databricks_conn_id='databricks_default',
-        job_id='899491427771975',
+        job_id='your_job_id',
         outlets=[BRONZE_ASSET]
     )
