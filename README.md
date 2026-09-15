@@ -33,7 +33,7 @@ Source: [NYC TLC Trip Record Data](https://www.nyc.gov/site/tlc/about/tlc-trip-r
 | Ingestion             | Databricks Autoloader (Structured Streaming) |
 | Data Lake / Warehouse | Databricks Delta Lake + Unity Catalog        |
 | Transformation        | dbt (dbt-databricks adapter)                 |
-| Orchestration         | Apache Airflow 3 (CeleryExecutor, Docker)    |
+| Orchestration         | Apache Airflow 3 (Docker)                    |
 | Containerization      | Docker Compose                               |
 
 ---
