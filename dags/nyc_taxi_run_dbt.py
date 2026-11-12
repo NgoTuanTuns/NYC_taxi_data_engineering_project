@@ -1,8 +1,8 @@
 import os
 from datetime import datetime, timedelta
+
 from airflow import DAG
 from airflow.operators.bash import BashOperator
-
 from datasets import BRONZE_ASSET
 
 default_args = {

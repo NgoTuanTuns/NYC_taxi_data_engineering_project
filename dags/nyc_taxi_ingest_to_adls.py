@@ -1,12 +1,10 @@
-import os
-import re
 import logging
+import os
 from datetime import datetime, timedelta
-import requests
+
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.microsoft.azure.hooks.data_lake import AzureDataLakeStorageV2Hook
-
 from datasets import ADLS_RAW_ASSET
 
 logger = logging.getLogger(__name__)
@@ -80,5 +78,3 @@ with DAG(
         python_callable=download_and_upload_to_adls,
         outlets=[ADLS_RAW_ASSET]
     )
-
-    upload_task

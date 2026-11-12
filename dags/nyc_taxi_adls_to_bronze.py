@@ -1,9 +1,9 @@
 import os
 from datetime import datetime, timedelta
+
 from airflow import DAG
 from airflow.models import Variable
 from airflow.providers.databricks.operators.databricks import DatabricksRunNowOperator
-
 from datasets import ADLS_RAW_ASSET, BRONZE_ASSET
 
 default_args = {
@@ -31,5 +31,3 @@ with DAG(
         job_id=DATABRICKS_JOB_ID,
         outlets=[BRONZE_ASSET]
     )
-
-    trigger_bronze_autoloader
