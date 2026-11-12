@@ -1,8 +1,9 @@
 {{
   config(
     materialized = 'incremental',
-    incremental_strategy='merge'
-    )
+    incremental_strategy = 'merge',
+    unique_key = 'yellow_taxi_trip_id'
+  )
 }}
 
 WITH source as(
@@ -16,19 +17,21 @@ WITH source as(
 deduplication AS(
     SELECT *
     FROM(
-        SELECT*,
-        ROW_NUMBER() OVER(PARTITION BY Vendorid, 
-        tpep_pickup_datetime,
-        tpep_dropoff_datetime,
-        passenger_count,
-        trip_distance,
-        PULocationID,
-        DOLocationID,
-        fare_amount,
-        passenger_count,
-        total_amount ORDER BY tpep_pickup_datetime) AS row_num
+        SELECT *,
+        ROW_NUMBER() OVER(
+            PARTITION BY VendorID, 
+                tpep_pickup_datetime,
+                tpep_dropoff_datetime,
+                passenger_count,
+                trip_distance,
+                PULocationID,
+                DOLocationID,
+                fare_amount,
+                total_amount 
+            ORDER BY tpep_pickup_datetime
+        ) AS row_num
         FROM source
-    )t
+    ) t
     WHERE row_num = 1
 ),
 

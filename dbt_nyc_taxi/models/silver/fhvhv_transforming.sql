@@ -1,8 +1,9 @@
 {{
   config(
     materialized = 'incremental',
-    incremental_strategy = 'merge'
-    )
+    incremental_strategy = 'merge',
+    unique_key = 'fhvhv_trip_id'
+  )
 }}
 WITH source AS(
     SELECT *
@@ -33,7 +34,7 @@ deduplication AS (
             ) AS row_number
         FROM source
     ) t
-    WHERE row_number == 1
+    WHERE row_number = 1
 ),
 
 

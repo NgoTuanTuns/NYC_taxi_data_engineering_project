@@ -1,8 +1,9 @@
 {{
   config(
     materialized = 'incremental',
-    incremental_strategy='merge'
-    )
+    incremental_strategy = 'merge',
+    unique_key = 'green_taxi_trip_id'
+  )
 }}
 WITH source as(
     SELECT *
@@ -18,7 +19,7 @@ FROM(
     SELECT
         *,
         ROW_NUMBER() OVER(PARTITION BY 
-            vendorId,
+            VendorID,
             lpep_pickup_datetime,
             lpep_dropoff_datetime,
             PULocationID,
@@ -30,7 +31,7 @@ FROM(
             ORDER BY lpep_pickup_datetime
         ) AS row_number
     FROM source
-)t 
+) t 
 WHERE row_number = 1
 ),
 
@@ -39,7 +40,7 @@ complete_null_handling AS (
         CASE
         WHEN passenger_count IS NULL 
             AND RatecodeID IS NULL 
-            AND store_AND_fwd_flag IS NULL 
+            AND store_and_fwd_flag IS NULL 
             THEN 'Vendor_feed_incomplete'
         WHEN passenger_count = 0 THEN 'Not_recorded'
         WHEN passenger_count IS NULL THEN 'Partial_null'
@@ -56,9 +57,9 @@ handling_invalid_value as(
             WHEN mta_tax < 0 THEN 'invalid_tax'
             WHEN improvement_surcharge < 0 THEN 'invalid_surcharge'
             WHEN fare_amount > 400 THEN 'invalid_fare_amount'
-            WHEN fare_amount < 0 AND payment_type not IN (4,6) THEN 'suspicious_negative_fare'
-            WHEN total_amount < 0 AND payment_type not IN (4,6) THEN 'suspicious_negative_total'
-            WHEN fare_amount < 0 or total_amount < 0 AND payment_type IN (4,6) THEN 'valid_refund'
+            WHEN fare_amount < 0 AND payment_type NOT IN (4, 6) THEN 'suspicious_negative_fare'
+            WHEN total_amount < 0 AND payment_type NOT IN (4, 6) THEN 'suspicious_negative_total'
+            WHEN (fare_amount < 0 OR total_amount < 0) AND payment_type IN (4, 6) THEN 'valid_refund'
         ELSE 'valid'
     END AS row_quality_flag
     FROM complete_null_handling
@@ -67,8 +68,7 @@ handling_invalid_value as(
 valid_data as (
     SELECT *
     FROM handling_invalid_value
-    WHERE row_quality_flag  IN ("valid",
-    "valid_refund", "suspicious_negative_fare", "suspicious_negative_total")
+    WHERE row_quality_flag IN ('valid', 'valid_refund', 'suspicious_negative_fare', 'suspicious_negative_total')
 ),
 
 

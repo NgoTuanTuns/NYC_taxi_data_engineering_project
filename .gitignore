@@ -1,3 +1,7 @@
+# Internal notes & guidegit add .
+.env
+*.env.local
+
 # Python-generated files
 __pycache__/
 *.py[oc]
@@ -5,6 +9,34 @@ build/
 dist/
 wheels/
 *.egg-info
+*.egg
 
 # Virtual environments
-.venv
+.venv/
+env/
+venv/
+ENV/
+
+# Data and parquet storage (keep folder with .gitkeep)
+data/*
+!data/.gitkeep
+*.parquet
+*.csv.gz
+*.duckdb
+
+# Airflow logs and configs
+logs/
+airflow.cfg
+
+# dbt artifacts
+dbt_nyc_taxi/target/
+dbt_nyc_taxi/dbt_packages/
+dbt_nyc_taxi/logs/
+*.gpickle
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini

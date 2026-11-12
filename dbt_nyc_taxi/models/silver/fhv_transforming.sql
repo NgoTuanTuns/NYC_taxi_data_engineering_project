@@ -1,8 +1,9 @@
 {{
   config(
     materialized = 'incremental',
-    incremental_strategy='merge'
-    )
+    incremental_strategy = 'merge',
+    unique_key = 'fhv_trip_id'
+  )
 }}
 WITH source AS(
 SELECT * FROM {{ ref('fhv_trip') }}
