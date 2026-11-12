@@ -179,6 +179,8 @@ dbt build
 1. **Idempotent Pipeline Execution**: 
    Every transformation step is safe to re-run without causing data duplication or loss. Silver and Gold layers utilize `MERGE` statements driven by deterministic surrogate keys and ingestion watermarks.
 2. **Resource Optimization**: 
-   Incremental modeling avoids expensive full table scans across multi-million record datasets, cutting Databricks compute runtime by over **80%**.
-3. **Decoupled Architecture**: 
+   Silver and Gold models are incremental: each run only processes rows newer than the last `ingestion_at` watermark instead of rebuilding the full multi-million-row tables.
+3. **Tested Transformations**: 
+   57 dbt column-level tests (`unique`, `not_null`, `accepted_values`, `expression_is_true`) across the four Silver models run as the last Airflow task.
+4. **Decoupled Architecture**: 
    Airflow DAGs are separated by concern and bound only by data assets rather than brittle time-based or hardcoded task triggers.
