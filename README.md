@@ -1,4 +1,4 @@
-# 🚖 NYC Taxi End-to-End Medallion Lakehouse Pipeline
+# NYC Taxi End-to-End Medallion Lakehouse Pipeline
 
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Apache Airflow](https://img.shields.io/badge/Apache%20Airflow-2.10%2B-017CEE?style=for-the-badge&logo=apache-airflow&logoColor=white)](https://airflow.apache.org/)
@@ -12,7 +12,7 @@ A production-grade, event-driven batch data engineering pipeline that ingests, c
 
 ---
 
-## 📐 Architecture Overview
+## Architecture Overview
 
 ![Pipeline Architecture](Diagram/Diagram.png)
 
@@ -37,7 +37,7 @@ A production-grade, event-driven batch data engineering pipeline that ingests, c
 
 ---
 
-## 🗂️ Data Sources
+## Data Sources
 
 The pipeline processes four primary trip record datasets published monthly by the NYC TLC (~15M - 20M records/month):
 
@@ -52,7 +52,7 @@ The pipeline processes four primary trip record datasets published monthly by th
 
 ---
 
-## 🛠️ Tech Stack & Technical Justification
+## Tech Stack & Technical Justification
 
 | Technology | Role | Why Chosen? |
 | :--- | :--- | :--- |
@@ -65,15 +65,15 @@ The pipeline processes four primary trip record datasets published monthly by th
 
 ---
 
-## 🏛️ Medallion Architecture Implementation
+## Medallion Architecture Implementation
 
-### 1. 🥉 Bronze Layer (Raw Ingestion)
+### 1. Bronze Layer (Raw Ingestion)
 - Ingested via Databricks Autoloader (`cloudFiles` format with `availableNow=True`).
 - Raw data stored in Delta Lake format without modifying source column values.
 - **Isolated State Management**: Each stream (`yellow`, `green`, `fhv`, `fhvhv`) maintains its own dedicated `checkpointLocation` and `cloudFiles.schemaLocation` to prevent state corruption.
 - Metadata enrichment: `ingestion_at` timestamp appended to track arrival time.
 
-### 2. 🥈 Silver Layer (Cleaned & Validated)
+### 2. Silver Layer (Cleaned & Validated)
 - **Materialization**: `incremental` with `incremental_strategy='merge'` on deterministic surrogate keys (`{{ dbt_utils.generate_surrogate_key(...) }}`).
 - **Watermarking**: Only processes records where `ingestion_at > (SELECT MAX(ingestion_at) FROM {{ this }})`.
 - **Deduplication**: `ROW_NUMBER() OVER (PARTITION BY [composite_natural_key] ORDER BY pickup_datetime)` ensures 0 duplicate transactions.
@@ -81,7 +81,7 @@ The pipeline processes four primary trip record datasets published monthly by th
   - **MNAR (Missing Not At Random) Pattern Handling**: Null values in `passenger_count` and `RatecodeID` are isolated by `VendorID` and tagged in `data_completeness_flag` instead of blindly dropped or imputed.
   - **Quality Flagging**: Trips with negative distances, impossible durations ($\le 0$), or extreme outlier fares are audited into `row_quality_flag`. Valid refunds are distinguished from suspicious transactions using payment types.
 
-### 3. 🥇 Gold Layer (Dimensional Modeling & Star Schema)
+### 3. Gold Layer (Dimensional Modeling & Star Schema)
 - **Dimension Tables (`gold/dim/`)**:
   - `dim_taxi_zone`: SCD Type 2 tracking changes in borough/zone allocations via dbt Snapshots (`check` strategy).
   - `dim_vendor`: SCD Type 2 tracking taxi technology providers.
@@ -92,7 +92,7 @@ The pipeline processes four primary trip record datasets published monthly by th
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 NYC_taxi/
@@ -125,7 +125,7 @@ NYC_taxi/
 
 ---
 
-## 🚀 Setup & Execution Guide
+## Setup & Execution Guide
 
 ### 1. Prerequisites
 - Docker Desktop (20.10+) & Docker Compose
@@ -158,7 +158,7 @@ docker compose exec airflow-webserver airflow dags trigger nyc_taxi_ingest_to_ad
 
 ---
 
-## 🧪 Data Testing & Quality Assurance
+## Data Testing & Quality Assurance
 
 Run complete dbt verification inside the dbt project:
 ```bash
@@ -174,7 +174,7 @@ dbt build
 
 ---
 
-## 📈 Engineering Highlights & Interview Talking Points
+## Engineering Highlights & Interview Talking Points
 
 1. **Idempotent Pipeline Execution**: 
    Every transformation step is safe to re-run without causing data duplication or loss. Silver and Gold layers utilize `MERGE` statements driven by deterministic surrogate keys and ingestion watermarks.
